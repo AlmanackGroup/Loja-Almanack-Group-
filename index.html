@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almanack Group - Manutenção</title>
+    <style>
+        /* Fundo escuro fixo */
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Canvas das partículas cobrindo a tela toda */
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Painel central por cima das partículas */
+        .box-manutencao {
+            position: relative;
+            z-index: 2;
+            background-color: rgba(30, 30, 30, 0.95);
+            padding: 40px;
+            border: 3px solid #333333;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.8);
+            max-width: 600px;
+            width: 85%;
+            text-align: center;
+        }
+
+        .nome-loja {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333333;
+            padding-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #ffaa00;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #b0b0b0;
+            margin: 20px 0;
+        }
+
+        .status {
+            display: inline-block;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            padding: 12px 24px;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid #444444;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="box-manutencao">
+        <div class="nome-loja">Almanack Group</div>
+        <h1>Loja de VIPs Indisponível</h1>
+        <p>A compra de VIPs está temporariamente <strong>indisponível</strong> devido a manutenções e melhorias no sistema.</p>
+        <p>Estamos trabalhando para retornar o mais rápido possível.</p>
+        <div class="status">Status: Em Manutenção</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particles-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const particlesArray = [];
+        const numberOfParticles = 75;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 1.2;
+                this.speedY = (Math.random() - 0.5) * 1.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function connect() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let dx = particlesArray[a].x - particlesArray[b].x;
+                    let dy = particlesArray[a].y - particlesArray[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${1 - distance / 120})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
